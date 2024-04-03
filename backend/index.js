@@ -59,6 +59,7 @@ app.get("/", jwtVerify, (req, res) => {
     user = { id: req.id, name: req.name, email: req.email };
     return res.status(201).json({ Message: `Welcome ${req.name}`, Data: user })
 })
+
 app.post('/register', (req, res) => {
     const sql = "INSERT INTO user (username, email, password) VALUES ?";
     bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {

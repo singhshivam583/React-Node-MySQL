@@ -1,7 +1,11 @@
 import React from "react";
 
 function Register() {
-  return <div>Register<h1>Shivam</h1></div>;
+  return (
+    <div>
+      
+    </div>
+  );
 }
 
 export default Register;

@@ -40,6 +40,25 @@ app.get('/health', (req, res) => {
     return res.json("Everything is OK")
 })
 
+const jwtVerify = (req, res, next) => {
+    const token = req.cookie.token;
+    if (!token) {
+        return res.status(400).json({ Message: "Your are not authenticated" })
+    }
+    jwt.verify(token, "jwt-secret-key", (err, decode) => {
+        if (err) return res.status(402).json({ Error: "Token match failed" });
+
+        req.id = decode.id;
+        req.name = decode.name;
+        req.namemaile = decode.email;
+        next();
+    })
+}
+
+app.get("/", jwtVerify, (req, res) => {
+    user = { id: req.id, name: req.name, email: req.email };
+    return res.status(201).json({ Message: `Welcome ${req.name}`, Data: user })
+})
 app.post('/register', (req, res) => {
     const sql = "INSERT INTO user (username, email, password) VALUES ?";
     bcrypt.hash(req.body.password.toString(), salt, (err, hash) => {
@@ -65,11 +84,10 @@ app.post('/login', (req, res) => {
                     const name = response[0].name;
                     const email = response[0].email;
 
-                    const token = jwt.sign({ id, name, email }, "jwt-secrete-key", { expiresIn: '1d' })
+                    const token = jwt.sign({ id, name, email }, "jwt-secret-key", { expiresIn: '1d' })
                     if (token == null) {
                         return res.status(403).send({ Message: 'Cookie not created' });
                     }
-
                     res.cookie('token', token);
                     return res.json({ Message: "User Logged In", User: result[0], Token: token })
                 } else {
